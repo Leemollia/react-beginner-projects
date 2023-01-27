@@ -1,4 +1,5 @@
 import './index.scss';
+import React from 'react';
 
 const questions = [
   {
@@ -22,37 +23,51 @@ const questions = [
   },
 ];
 
-function Result() {
+function Result({correctAnswers, setActiveSlide, setCorrectAnswers}) {
+  const clickReset = () => {
+    setActiveSlide(0);
+    setCorrectAnswers(0);
+  }
   return (
     <div className="result">
       <img src="https://cdn-icons-png.flaticon.com/512/2278/2278992.png" />
-      <h2>Вы отгадали 3 ответа из 10</h2>
-      <button>Попробовать снова</button>
+      <h2>Вы отгадали {correctAnswers} ответа из {questions.length}</h2>
+      <button onClick={clickReset}>Попробовать снова</button>
     </div>
   );
 }
 
-function Game() {
+function Game({ activeSlide, setActiveSlide, correctAnswers, setCorrectAnswers }) {
+
+  const clickVariant = (ind) => {
+    setActiveSlide(activeSlide + 1);
+    if (questions[activeSlide].correct === ind) {
+      setCorrectAnswers(correctAnswers + 1);
+    }
+  }
+
   return (
     <>
       <div className="progress">
-        <div style={{ width: '50%' }} className="progress__inner"></div>
+        <div style={{ width: activeSlide * 100 / questions.length + '%' }} className="progress__inner"></div>
       </div>
-      <h1>Что такое useState?</h1>
+      <h1>{questions[activeSlide].title}</h1>
       <ul>
-        <li>Это функция для хранения данных компонента</li>
-        <li>Это глобальный стейт</li>
-        <li>Это когда на ты никому не нужен</li>
+        {questions[activeSlide].variants.map((item, ind) => <li key={ind + item} onClick={() => clickVariant(ind)}>{item}</li>)}
       </ul>
     </>
   );
 }
 
 function App() {
+  const [activeSlide, setActiveSlide] = React.useState(0);
+  const [correctAnswers, setCorrectAnswers] = React.useState(0);
+
   return (
     <div className="App">
-      <Game />
-      {/* <Result /> */}
+      {activeSlide < questions.length ?
+        <Game activeSlide={activeSlide} setActiveSlide={setActiveSlide} correctAnswers={correctAnswers} setCorrectAnswers={setCorrectAnswers} /> :
+        <Result activeSlide={activeSlide} setActiveSlide={setActiveSlide} correctAnswers={correctAnswers} setCorrectAnswers={setCorrectAnswers}/>}
     </div>
   );
 }
